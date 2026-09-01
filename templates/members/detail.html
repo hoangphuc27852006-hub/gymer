@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}Chi tiết hội viên - Hệ thống Quản lý Phòng Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Chi tiết hội viên: {{ hv.ho_ten }}</h1>
+    <div>
+        <a href="{{ url_for('members.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="memberTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="thongtin-tab" data-bs-toggle="tab" data-bs-target="#thongtin" type="button" role="tab" aria-controls="thongtin" aria-selected="true">Thông tin</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="chiso-tab" data-bs-toggle="tab" data-bs-target="#chiso" type="button" role="tab" aria-controls="chiso" aria-selected="false">Chỉ số cơ thể</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="checkin-tab" data-bs-toggle="tab" data-bs-target="#checkin" type="button" role="tab" aria-controls="checkin" aria-selected="false">Lịch sử Check-in</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="goitap-tab" data-bs-toggle="tab" data-bs-target="#goitap" type="button" role="tab" aria-controls="goitap" aria-selected="false">Gói tập</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="buoipt-tab" data-bs-toggle="tab" data-bs-target="#buoipt" type="button" role="tab" aria-controls="buoipt" aria-selected="false">Buổi PT</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="memberTabContent">
+  <!-- Tab 1 - Thông tin -->
+  <div class="tab-pane fade show active" id="thongtin" role="tabpanel" aria-labelledby="thongtin-tab">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin cá nhân</h6>
+                    {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+                    <a href="{{ url_for('members.edit', ma_hv=hv.ma_hv) }}" class="btn btn-sm btn-primary">Sửa TT</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-circle fa-5x text-gray-300"></i>
+                    </div>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr><th width="30%">Họ tên:</th><td>{{ hv.ho_ten }}</td></tr>
+                            <tr><th>SĐT:</th><td>{{ hv.sdt }}</td></tr>
+                            <tr><th>CCCD:</th><td>{{ hv.cccd }}</td></tr>
+                            <tr><th>Giới tính:</th><td>{{ hv.gioi_tinh }}</td></tr>
+                            <tr><th>Ngày sinh:</th><td>{{ hv.ngay_sinh|dateformat if hv.ngay_sinh else '' }}</td></tr>
+                            <tr><th>Địa chỉ:</th><td>{{ hv.dia_chi }}</td></tr>
+                            <tr><th>Trạng thái:</th>
+                                <td>
+                                    {% if hv.trang_thai == 'active' %}<span class="badge bg-success">Đang HĐ</span>
+                                    {% elif hv.trang_thai == 'inactive' %}<span class="badge bg-secondary">Ngừng HĐ</span>
+                                    {% else %}<span class="badge bg-danger">{{ hv.trang_thai }}</span>{% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Gói tập hiện tại</h6>
+                    <div>
+                        <a href="{{ url_for('packages.buy', ma_hv=hv.ma_hv) }}" class="btn btn-sm btn-success">Mua gói</a>
+                        <form method="POST" action="{{ url_for('checkin.do') }}" class="d-inline">
+                            <input type="hidden" name="ma_hv" value="{{ hv.ma_hv }}">
+                            <button type="submit" class="btn btn-sm btn-info text-white">Check-in</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if hv.goi_hien_tai %}
+                        <h5>{{ hv.goi_hien_tai.ten_goi }}</h5>
+                        <p><strong>Ngày hết hạn:</strong> {{ hv.goi_hien_tai.ngay_het_han|dateformat if hv.goi_hien_tai.ngay_het_han else '' }}</p>
+                        <p><strong>Số buổi PT còn lại:</strong> {{ hv.goi_hien_tai.so_buoi_pt_con_lai }}</p>
+                        <p><strong>Trạng thái:</strong> 
+                            {% if hv.goi_hien_tai.trang_thai == 'active' %}<span class="badge bg-success">Đang hoạt động</span>
+                            {% elif hv.goi_hien_tai.trang_thai == 'expired' %}<span class="badge bg-danger">Hết hạn</span>
+                            {% elif hv.goi_hien_tai.trang_thai == 'waiting' %}<span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            {% else %}<span class="badge bg-secondary">{{ hv.goi_hien_tai.trang_thai }}</span>{% endif %}
+                        </p>
+                    {% else %}
+                        <p class="text-muted">Chưa có gói tập nào đang hoạt động.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Tab 2 - Chỉ số cơ thể -->
+  <div class="tab-pane fade" id="chiso" role="tabpanel" aria-labelledby="chiso-tab">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Lịch sử chỉ số cơ thể</h6>
+            {% if current_user.vai_tro in ['admin', 'nhanvien', 'pt'] %}
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addChiSoModal">
+                Thêm chỉ số
+            </button>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Ngày đo</th>
+                            <th>Chiều cao (cm)</th>
+                            <th>Cân nặng (kg)</th>
+                            <th>Vòng eo (cm)</th>
+                            <th>% Mỡ</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for chiso in chi_so_list %}
+                        <tr>
+                            <td>{{ chiso.ngay_do|dateformat }}</td>
+                            <td>{{ chiso.chieu_cao }}</td>
+                            <td>{{ chiso.can_nang }}</td>
+                            <td>{{ chiso.vong_eo }}</td>
+                            <td>{{ chiso.phan_tram_mo }}</td>
+                            <td>{{ chiso.ghi_chu }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6" class="text-center">Chưa có dữ liệu</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Tab 3 - Lịch sử check-in -->
+  <div class="tab-pane fade" id="checkin" role="tabpanel" aria-labelledby="checkin-tab">
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Thời gian vào</th>
+                            <th>Thời gian ra</th>
+                            <th>Thời lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for checkin in checkin_list %}
+                        <tr>
+                            <td>{{ checkin.thoi_gian_vao|datetimeformat }}</td>
+                            <td>{{ checkin.thoi_gian_ra|datetimeformat if checkin.thoi_gian_ra else 'Chưa ra' }}</td>
+                            <td>{{ checkin.thoi_luong or '-' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center">Chưa có lịch sử check-in</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Tab 4 - Gói tập -->
+  <div class="tab-pane fade" id="goitap" role="tabpanel" aria-labelledby="goitap-tab">
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tên gói</th>
+                            <th>Ngày đăng kí</th>
+                            <th>Bắt đầu</th>
+                            <th>Hết hạn</th>
+                            <th>Buổi PT còn</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for goi in goi_list %}
+                        <tr>
+                            <td>{{ goi.ten_goi }}</td>
+                            <td>{{ goi.ngay_dang_ki|dateformat }}</td>
+                            <td>{{ goi.ngay_bat_dau|dateformat if goi.ngay_bat_dau else '' }}</td>
+                            <td>{{ goi.ngay_het_han|dateformat if goi.ngay_het_han else '' }}</td>
+                            <td>{{ goi.so_buoi_pt_con_lai }}</td>
+                            <td>
+                                {% if goi.trang_thai == 'active' %}<span class="badge bg-success">Đang HĐ</span>
+                                {% elif goi.trang_thai == 'expired' %}<span class="badge bg-danger">Hết hạn</span>
+                                {% elif goi.trang_thai == 'waiting' %}<span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                {% else %}<span class="badge bg-secondary">{{ goi.trang_thai }}</span>{% endif %}
+                            </td>
+                            <td>
+                                {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+                                    {% if goi.trang_thai == 'waiting' %}
+                                    <form method="POST" action="{{ url_for('packages.activate', id=goi.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success">Kích hoạt</button>
+                                    </form>
+                                    {% elif goi.trang_thai == 'active' %}
+                                    <form method="POST" action="{{ url_for('packages.expire', id=goi.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger">Báo hết hạn</button>
+                                    </form>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="7" class="text-center">Chưa có gói tập nào</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Tab 5 - Buổi PT -->
+  <div class="tab-pane fade" id="buoipt" role="tabpanel" aria-labelledby="buoipt-tab">
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>PT</th>
+                            <th>Thời gian</th>
+                            <th>Trạng thái</th>
+                            <th>Đơn giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for buoi in buoi_pt_list %}
+                        <tr>
+                            <td>{{ buoi.pt_ten }}</td>
+                            <td>{{ buoi.thoi_gian|datetimeformat }}</td>
+                            <td>
+                                {% if buoi.trang_thai == 'completed' %}<span class="badge bg-success">Đã hoàn thành</span>
+                                {% elif buoi.trang_thai == 'scheduled' %}<span class="badge bg-info">Đã lên lịch</span>
+                                {% elif buoi.trang_thai == 'cancelled' %}<span class="badge bg-danger">Đã hủy</span>
+                                {% else %}<span class="badge bg-secondary">{{ buoi.trang_thai }}</span>{% endif %}
+                            </td>
+                            <td>{{ buoi.don_gia|vnd }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center">Chưa có buổi PT nào</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Thêm chỉ số -->
+<div class="modal fade" id="addChiSoModal" tabindex="-1" aria-labelledby="addChiSoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addChiSoModalLabel">Thêm chỉ số cơ thể</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{{ url_for('members.add_chiso', ma_hv=hv.ma_hv) }}">
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label for="chieu_cao" class="form-label">Chiều cao (cm)</label>
+                  <input type="number" step="0.1" class="form-control" id="chieu_cao" name="chieu_cao">
+              </div>
+              <div class="mb-3">
+                  <label for="can_nang" class="form-label">Cân nặng (kg)</label>
+                  <input type="number" step="0.1" class="form-control" id="can_nang" name="can_nang">
+              </div>
+              <div class="mb-3">
+                  <label for="vong_eo" class="form-label">Vòng eo (cm)</label>
+                  <input type="number" step="0.1" class="form-control" id="vong_eo" name="vong_eo">
+              </div>
+              <div class="mb-3">
+                  <label for="phan_tram_mo" class="form-label">% Mỡ</label>
+                  <input type="number" step="0.1" class="form-control" id="phan_tram_mo" name="phan_tram_mo">
+              </div>
+              <div class="mb-3">
+                  <label for="ghi_chu" class="form-label">Ghi chú</label>
+                  <textarea class="form-control" id="ghi_chu" name="ghi_chu" rows="2"></textarea>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

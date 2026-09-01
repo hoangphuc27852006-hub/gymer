@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Phòng tập</h2>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoomModal">
+            <i class="fa-solid fa-plus"></i> Thêm phòng
+        </button>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for phong in phong_list %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title text-primary mb-0"><i class="fa-solid fa-door-open"></i> {{ phong.ten_phong }}</h5>
+                        {% if phong.trang_thai == 'active' %}
+                        <span class="badge bg-success">Đang hoạt động</span>
+                        {% elif phong.trang_thai == 'maintenance' %}
+                        <span class="badge bg-warning text-dark">Bảo trì</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ phong.trang_thai }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="card-text text-muted mb-1"><i class="fa-solid fa-location-dot"></i> <strong>Vị trí:</strong> {{ phong.vi_tri }}</p>
+                    <p class="card-text text-muted mb-3"><i class="fa-solid fa-users"></i> <strong>Sức chứa:</strong> {{ phong.suc_chua }} người</p>
+                </div>
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-end gap-2 pb-3">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ phong.id }}">
+                        <i class="fa-solid fa-pen-to-square"></i> Sửa
+                    </button>
+                    <form action="{{ url_for('rooms.toggle', id=phong.id) }}" method="POST" class="d-inline">
+                        {% if phong.trang_thai == 'active' %}
+                        <button type="submit" class="btn btn-sm btn-outline-warning" title="Bảo trì"><i class="fa-solid fa-wrench"></i> Bảo trì</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-sm btn-outline-success" title="Mở lại"><i class="fa-solid fa-check"></i> Mở lại</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Room Modal -->
+        <div class="modal fade" id="editRoomModal{{ phong.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title">Sửa thông tin phòng tập</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ url_for('rooms.edit', id=phong.id) }}" method="POST">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Tên phòng</label>
+                                <input type="text" name="ten_phong" class="form-control" value="{{ phong.ten_phong }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Vị trí</label>
+                                <input type="text" name="vi_tri" class="form-control" value="{{ phong.vi_tri }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sức chứa</label>
+                                <input type="number" name="suc_chua" class="form-control" value="{{ phong.suc_chua }}" required min="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Trạng thái</label>
+                                <select name="trang_thai" class="form-select">
+                                    <option value="active" {% if phong.trang_thai == 'active' %}selected{% endif %}>Đang hoạt động</option>
+                                    <option value="maintenance" {% if phong.trang_thai == 'maintenance' %}selected{% endif %}>Bảo trì</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted py-5">
+            <i class="fa-solid fa-door-open fa-3x mb-3 text-secondary"></i>
+            <p>Chưa có phòng tập nào.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Add Room Modal -->
+    <div class="modal fade" id="addRoomModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Thêm phòng tập mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ url_for('rooms.add') }}" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Tên phòng <span class="text-danger">*</span></label>
+                            <input type="text" name="ten_phong" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Vị trí <span class="text-danger">*</span></label>
+                            <input type="text" name="vi_tri" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sức chứa <span class="text-danger">*</span></label>
+                            <input type="number" name="suc_chua" class="form-control" required min="1">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Thêm phòng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

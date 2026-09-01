@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 bg-dark text-white mt-4">
+                <div class="card-header bg-danger text-white border-0 py-3">
+                    <h4 class="mb-0"><i class="fa-solid fa-cart-shopping me-2"></i>Đăng kí gói tập</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('packages.buy') }}">
+                        <div class="mb-3">
+                            <label for="ma_hv" class="form-label">Hội viên <span class="text-danger">*</span></label>
+                            <select class="form-select bg-secondary text-white border-0" id="ma_hv" name="ma_hv" required>
+                                <option value="">-- Chọn hội viên --</option>
+                                {% for hv in hv_list %}
+                                <option value="{{ hv.ma_hv }}" {% if selected_hv and selected_hv.ma_hv == hv.ma_hv %}selected{% endif %}>
+                                    {{ hv.ma_hv }} - {{ hv.ho_ten }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="ma_goi" class="form-label">Gói tập <span class="text-danger">*</span></label>
+                            <select class="form-select bg-secondary text-white border-0" id="ma_goi" name="ma_goi" required>
+                                <option value="">-- Chọn gói tập --</option>
+                                {% for goi in goi_list %}
+                                <option value="{{ goi.ma_goi }}" 
+                                        data-gia="{{ goi.gia_tien|vnd }}" 
+                                        data-thoihan="{{ goi.thoi_han }}" 
+                                        data-pt="{{ goi.so_buoi_pt }}">
+                                    {{ goi.ten_goi }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div id="package-info" class="card bg-secondary border-0 mb-4 d-none">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger mb-3">Thông tin gói</h5>
+                                <p class="mb-1"><strong>Giá tiền:</strong> <span id="info-gia" class="text-warning"></span></p>
+                                <p class="mb-1"><strong>Thời hạn:</strong> <span id="info-thoihan"></span> ngày</p>
+                                <p class="mb-0"><strong>Số buổi PT:</strong> <span id="info-pt"></span> buổi</p>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="kich_hoat" name="kich_hoat" value="1" checked>
+                            <label class="form-check-label" for="kich_hoat">
+                                Kích hoạt ngay (Bắt đầu tính ngày hôm nay)
+                            </label>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('packages.index') }}" class="btn btn-secondary">Hủy</a>
+                            <button type="submit" class="btn btn-danger">Đăng kí</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const goiSelect = document.getElementById('ma_goi');
+        const packageInfo = document.getElementById('package-info');
+        
+        goiSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (this.value) {
+                document.getElementById('info-gia').textContent = selectedOption.dataset.gia;
+                document.getElementById('info-thoihan').textContent = selectedOption.dataset.thoihan;
+                document.getElementById('info-pt').textContent = selectedOption.dataset.pt;
+                packageInfo.classList.remove('d-none');
+            } else {
+                packageInfo.classList.add('d-none');
+            }
+        });
+        
+        // Trigger if already selected (e.g., after validation error)
+        if (goiSelect.value) {
+            goiSelect.dispatchEvent(new Event('change'));
+        }
+    });
+</script>
+{% endblock %}

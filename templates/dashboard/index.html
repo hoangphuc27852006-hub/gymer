@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="text-danger mb-4"><i class="fa-solid fa-chart-line me-2"></i>Tổng quan hệ thống</h2>
+    
+    <!-- Stats Row -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-primary bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-users fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Tổng hội viên</h6>
+                        <h3 class="mb-0">{{ tong_hv }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-success bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-door-open fa-2x text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Đang trong phòng</h6>
+                        <h3 class="mb-0">{{ hv_checkin }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle" style="background-color: rgba(111, 66, 193, 0.25); padding: 1rem; margin-right: 1rem;">
+                        <i class="fa-solid fa-id-card fa-2x" style="color: #6f42c1;"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Gói đang dùng</h6>
+                        <h3 class="mb-0">{{ goi_active }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-warning bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-exclamation-triangle fa-2x text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Gói sắp hết hạn (30 ngày)</h6>
+                        <h3 class="mb-0">{{ goi_het_han_30 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-danger bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-dumbbell fa-2x text-danger"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Buổi PT hôm nay</h6>
+                        <h3 class="mb-0">{{ buoi_pt_hom_nay }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-info bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-chalkboard-teacher fa-2x text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Tổng PT</h6>
+                        <h3 class="mb-0">{{ tong_pt }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa-solid fa-sign-in-alt me-2 text-success"></i>Check-in hôm nay</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Hội viên</th>
+                                    <th>Trạng thái gói</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ci in recent_checkins %}
+                                <tr>
+                                    <td>{{ ci.thoi_gian|datetimeformat }}</td>
+                                    <td>{{ ci.ho_ten }}</td>
+                                    <td>
+                                        {% if ci.goi_status == 'active' %}
+                                        <span class="badge bg-success">Hợp lệ</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Hết hạn</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-3">Chưa có lượt check-in nào hôm nay</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-calendar-day me-2 text-danger"></i>Buổi PT hôm nay</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for pt in buoi_pt_today %}
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ pt.thoi_gian|datetimeformat }}</h6>
+                                <small class="text-muted">HV: {{ pt.ho_ten_hv }} | PT: {{ pt.ho_ten_pt }}</small>
+                            </div>
+                            <span class="badge bg-info">Đã lên lịch</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item bg-dark text-white border-secondary text-center text-muted py-3">
+                            Không có buổi PT nào hôm nay
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiring Packages -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark text-white border-0 shadow-sm">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-exclamation-circle me-2 text-warning"></i>Gói sắp hết hạn (trong 30 ngày)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Hội viên</th>
+                                    <th>Gói tập</th>
+                                    <th>Ngày đăng kí</th>
+                                    <th>Ngày hết hạn</th>
+                                    <th>Số ngày còn lại</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for goi in goi_sap_het %}
+                                <tr>
+                                    <td>{{ goi.ho_ten_hv }}</td>
+                                    <td>{{ goi.ten_goi }}</td>
+                                    <td>{{ goi.ngay_dang_ki|dateformat }}</td>
+                                    <td>{{ goi.ngay_het_han|dateformat }}</td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">{{ goi.ngay_con_lai }} ngày</span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">Không có gói nào sắp hết hạn</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

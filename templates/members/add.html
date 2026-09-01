@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Thêm hội viên - Hệ thống Quản lý Phòng Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Thêm hội viên mới</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('members.add') }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="ho_ten" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="ho_ten" name="ho_ten" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="sdt" class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" id="sdt" name="sdt">
+                </div>
+                <div class="col-md-6">
+                    <label for="cccd" class="form-label">CCCD</label>
+                    <input type="text" class="form-control" id="cccd" name="cccd">
+                </div>
+                <div class="col-md-6">
+                    <label for="ngay_sinh" class="form-label">Ngày sinh</label>
+                    <input type="date" class="form-control" id="ngay_sinh" name="ngay_sinh">
+                </div>
+                <div class="col-md-12">
+                    <label for="dia_chi" class="form-label">Địa chỉ</label>
+                    <input type="text" class="form-control" id="dia_chi" name="dia_chi">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label d-block">Giới tính</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gioi_tinh" id="gioi_tinh_nam" value="Nam" checked>
+                        <label class="form-check-label" for="gioi_tinh_nam">Nam</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gioi_tinh" id="gioi_tinh_nu" value="Nữ">
+                        <label class="form-check-label" for="gioi_tinh_nu">Nữ</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                <a href="{{ url_for('members.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i> Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

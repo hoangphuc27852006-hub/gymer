@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Check-in / Check-out{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="fa-solid fa-door-open me-2 text-danger"></i>Check-in / Check-out</h2>
+
+    <!-- Quick check-in by phone -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body bg-light rounded">
+            <h4 class="card-title text-danger"><i class="fa-solid fa-bolt"></i> Check-in / Check-out nhanh bằng SĐT</h4>
+            <form action="{{ url_for('checkin.quick_checkin') }}" method="POST" class="d-flex align-items-center mt-3 gap-3">
+                <input type="text" name="sdt" class="form-control form-control-lg w-50" placeholder="Nhập số điện thoại hội viên..." required>
+                <button type="submit" class="btn btn-danger btn-lg"><i class="fa-solid fa-check"></i> Check-in/out nhanh</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Current members in gym -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-users"></i> Hiện đang trong phòng ({{ dang_trong|length }} người)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Họ tên</th>
+                                    <th>SĐT</th>
+                                    <th>Thời gian vào</th>
+                                    <th>Thời lượng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for luot in dang_trong %}
+                                <tr class="checkin-live-row">
+                                    <td><strong>{{ luot.hoi_vien.ho_ten }}</strong></td>
+                                    <td>{{ luot.hoi_vien.sdt }}</td>
+                                    <td>{{ luot.thoi_gian_checkin|datetimeformat }}</td>
+                                    <td>
+                                        <span class="text-success" data-checkin-time="{{ luot.thoi_gian_checkin }}">
+                                            <i class="fa-solid fa-clock"></i> Đang tính...
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form action="{{ url_for('checkin.do_checkout', luot_id=luot.ma_luot) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Check-out</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-3 text-muted">Không có hội viên nào trong phòng.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual check-in form -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fa-solid fa-user-check"></i> Check-in thủ công</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('checkin.do_checkin') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="ma_hv" class="form-label">Chọn hội viên</label>
+                            <select name="ma_hv" id="ma_hv" class="form-select" required>
+                                <option value="" selected disabled>-- Chọn hội viên --</option>
+                                {% for hv in hv_list %}
+                                <option value="{{ hv.ma_hv }}">{{ hv.ma_hv }} - {{ hv.ho_ten }} ({{ hv.sdt }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100"><i class="fa-solid fa-arrow-right-to-bracket"></i> Check-in</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today history -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử trong ngày</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Họ tên</th>
+                            <th>Giờ vào</th>
+                            <th>Giờ ra</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for luot in lich_su %}
+                        <tr>
+                            <td>{{ luot.hoi_vien.ho_ten }}</td>
+                            <td>{{ luot.thoi_gian_checkin|datetimeformat }}</td>
+                            <td>{{ luot.thoi_gian_checkout|datetimeformat if luot.thoi_gian_checkout else '—' }}</td>
+                            <td>
+                                {% if luot.thoi_gian_checkout %}
+                                <span class="badge bg-secondary">Đã ra</span>
+                                {% else %}
+                                <span class="badge bg-success">Đang tập</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3 text-muted">Chưa có lịch sử check-in trong ngày.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

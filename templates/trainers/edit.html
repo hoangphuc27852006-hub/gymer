@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm max-w-lg mx-auto border-0" style="max-width: 800px;">
+    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+        <h4 class="mb-0">Cập nhật Huấn luyện viên</h4>
+    </div>
+    <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('edit_trainer', id=pt.id) }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" name="ho_ten" class="form-control" value="{{ pt.ho_ten }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CCCD</label>
+                    <input type="text" name="cccd" class="form-control" value="{{ pt.cccd }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" name="sdt" class="form-control" value="{{ pt.sdt }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" name="ngay_sinh" class="form-control" value="{{ pt.ngay_sinh }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Số năm kinh nghiệm</label>
+                    <input type="number" name="kinh_nghiem" class="form-control" value="{{ pt.kinh_nghiem }}" min="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Chuyên môn</label>
+                    <input type="text" name="chuyen_mon" class="form-control" value="{{ pt.chuyen_mon }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Lương cơ bản</label>
+                    <input type="number" name="luong_co_ban" class="form-control" value="{{ pt.luong_co_ban }}" min="0">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Trạng thái</label>
+                    <select name="trang_thai" class="form-select">
+                        <option value="active" {% if pt.trang_thai == 'active' %}selected{% endif %}>Đang làm việc</option>
+                        <option value="inactive" {% if pt.trang_thai == 'inactive' %}selected{% endif %}>Nghỉ việc</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-4 text-end">
+                    <a href="{{ url_for('trainer_detail', id=pt.id) }}" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm max-w-lg mx-auto border-0" style="max-width: 800px;">
+    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+        <h4 class="mb-0">Thêm Nhân viên mới</h4>
+    </div>
+    <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('add_staff') }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+                    <input type="text" name="ho_ten" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CCCD</label>
+                    <input type="text" name="cccd" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" name="ngay_sinh" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" name="sdt" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Ngày vào làm</label>
+                    <input type="date" name="ngay_vao_lam" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Chức vụ</label>
+                    <input type="text" name="chuc_vu" class="form-control">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Lương cơ bản</label>
+                    <input type="number" name="luong_co_ban" class="form-control" min="0">
+                </div>
+                <div class="col-12 mt-4 text-end">
+                    <a href="{{ url_for('staff') }}" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-primary">Lưu thông tin</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

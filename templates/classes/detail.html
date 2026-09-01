@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Chi tiết lớp: {{ lop.ten_lop }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-calendar-days me-2 text-danger"></i>{{ lop.ten_lop }}</h2>
+    <div>
+        {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+        <a href="{{ url_for('classes.edit', ma_lop=lop.ma_lop) }}" class="btn btn-warning"><i class="fa-solid fa-pen"></i> Chỉnh sửa</a>
+        {% endif %}
+        <a href="{{ url_for('classes.index') }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Trở lại</a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Loại lớp:</strong> {{ lop.loai_lop.ten_loai }}</p>
+                        <p><strong>Huấn luyện viên:</strong> {{ lop.pt.ho_ten }}</p>
+                        <p><strong>Phòng tập:</strong> {{ lop.phong_tap.ten_phong }}</p>
+                        <p><strong>Sức chứa:</strong> {{ lop.phong_tap.suc_chua }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Lịch học:</strong> {{ lop.thu_hoc_display }}</p>
+                        <p><strong>Giờ:</strong>
+                            {% if lop.gio_bat_dau %}{{ lop.gio_bat_dau.strftime('%H:%M') }}{% endif %}
+                            —
+                            {% if lop.gio_ket_thuc %}{{ lop.gio_ket_thuc.strftime('%H:%M') }}{% endif %}
+                        </p>
+                        <p><strong>Thời gian khóa:</strong> {{ lop.ngay_bat_dau|dateformat }} — {{ lop.ngay_ket_thuc|dateformat }}</p>
+                        <p><strong>Trạng thái:</strong>
+                            {% if lop.trang_thai == 'open' %}
+                                <span class="badge bg-success">Đang mở</span>
+                            {% elif lop.trang_thai == 'full' %}
+                                <span class="badge bg-warning text-dark">Đã đủ người</span>
+                            {% else %}
+                                <span class="badge bg-danger">Đã đóng</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Danh sách buổi học ({{ lop.buoi_hoc_list.count() }} buổi)</h4>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Ngày học</th>
+                        <th>Thứ</th>
+                        <th>Số đăng kí</th>
+                        <th>Còn chỗ</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for buoi in buoi_list.items %}
+                    <tr {% if buoi.ngay_hoc == today %}class="table-info"{% endif %}>
+                        <td>{{ buoi.ngay_hoc|dateformat }}</td>
+                        <td>{{ buoi.ngay_hoc.strftime('%A') }}</td>
+                        <td>{{ buoi.so_dang_ky }}</td>
+                        <td>{{ buoi.con_cho }}</td>
+                        <td>
+                            {% if buoi.trang_thai == 'upcoming' %}
+                                <span class="badge bg-warning text-dark">Sắp diễn ra</span>
+                            {% elif buoi.trang_thai == 'ongoing' %}
+                                <span class="badge bg-info">Đang diễn ra</span>
+                            {% elif buoi.trang_thai == 'completed' %}
+                                <span class="badge bg-success">Đã hoàn thành</span>
+                            {% elif buoi.trang_thai == 'cancelled' %}
+                                <span class="badge bg-danger">Đã hủy</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('classes.session_detail', ma_buoi=buoi.ma_buoi) }}" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-eye"></i> Xem</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Không có buổi học nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if buoi_list.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if buoi_list.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('classes.detail', ma_lop=lop.ma_lop, page=buoi_list.prev_num) }}">Trước</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Trước</span></li>
+                {% endif %}
+
+                {% for page_num in buoi_list.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == buoi_list.page %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('classes.detail', ma_lop=lop.ma_lop, page=page_num) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if buoi_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('classes.detail', ma_lop=lop.ma_lop, page=buoi_list.next_num) }}">Sau</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Sau</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

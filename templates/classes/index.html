@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Lớp học{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-calendar-days me-2 text-danger"></i>Lớp học</h2>
+    {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+    <a href="{{ url_for('classes.add') }}" class="btn btn-danger"><i class="fa-solid fa-plus"></i> Tạo lớp mới</a>
+    {% endif %}
+</div>
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('classes.index') }}" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" class="form-control" name="q" value="{{ q or '' }}" placeholder="Tìm kiếm lớp...">
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="status">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="open" {% if status == 'open' %}selected{% endif %}>Đang mở</option>
+                    <option value="full" {% if status == 'full' %}selected{% endif %}>Đã đủ người</option>
+                    <option value="closed" {% if status == 'closed' %}selected{% endif %}>Đã đóng</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Mã lớp</th>
+                        <th>Tên lớp</th>
+                        <th>Loại</th>
+                        <th>PT</th>
+                        <th>Phòng</th>
+                        <th>Lịch học</th>
+                        <th>Giờ</th>
+                        <th>Thời gian</th>
+                        <th>Số buổi</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lop in lop_list %}
+                    <tr>
+                        <td>{{ lop.ma_lop }}</td>
+                        <td><strong>{{ lop.ten_lop }}</strong></td>
+                        <td>{{ lop.loai_lop.ten_loai }}</td>
+                        <td>{{ lop.pt.ho_ten }}</td>
+                        <td>{{ lop.phong_tap.ten_phong }}</td>
+                        <td>{{ lop.thu_hoc_display }}</td>
+                        <td>
+                            {% if lop.gio_bat_dau %}{{ lop.gio_bat_dau.strftime('%H:%M') }}{% endif %}
+                            —
+                            {% if lop.gio_ket_thuc %}{{ lop.gio_ket_thuc.strftime('%H:%M') }}{% endif %}
+                        </td>
+                        <td>{{ lop.ngay_bat_dau|dateformat }} — {{ lop.ngay_ket_thuc|dateformat }}</td>
+                        <td>{{ lop.buoi_hoc_list.count() }}</td>
+                        <td>
+                            {% if lop.trang_thai == 'open' %}
+                                <span class="badge bg-success">Đang mở</span>
+                            {% elif lop.trang_thai == 'full' %}
+                                <span class="badge bg-warning text-dark">Đã đủ</span>
+                            {% else %}
+                                <span class="badge bg-danger">Đã đóng</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('classes.detail', ma_lop=lop.ma_lop) }}" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-eye"></i> Xem</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center text-muted">Không tìm thấy lớp học nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

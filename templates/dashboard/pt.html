@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger"><i class="fa-solid fa-user-ninja me-2"></i>Khu vực Huấn Luyện Viên</h2>
+        <span class="fs-5 text-white">Xin chào, <strong>{{ pt_obj.ho_ten }}</strong></span>
+    </div>
+    
+    <!-- Stats Row -->
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-info bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-check-double fa-2x text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Tổng buổi đã dạy</h6>
+                        <h3 class="mb-0">{{ total_sessions }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-warning bg-opacity-25 p-3 me-3">
+                        <i class="fa-solid fa-calendar-alt fa-2x text-warning"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Buổi sắp tới</h6>
+                        <h3 class="mb-0">{{ upcoming_sessions }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-clock me-2 text-danger"></i>Lịch dạy hôm nay</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for buoi in my_buoi_pt %}
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1 text-danger">{{ buoi.thoi_gian|datetimeformat }}</h5>
+                                <p class="mb-0">Hội viên: <strong>{{ buoi.ho_ten_hv }}</strong></p>
+                            </div>
+                            {% if buoi.trang_thai == 'scheduled' %}
+                            <span class="badge bg-info">Đã lên lịch</span>
+                            {% elif buoi.trang_thai == 'completed' %}
+                            <span class="badge bg-success">Hoàn thành</span>
+                            {% else %}
+                            <span class="badge bg-warning">{{ buoi.trang_thai }}</span>
+                            {% endif %}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item bg-dark text-white border-secondary text-center text-muted py-4">
+                            Bạn không có lịch dạy nào hôm nay
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-users me-2 text-success"></i>Lớp học của tôi</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tên lớp</th>
+                                    <th>Lịch học</th>
+                                    <th>Sĩ số</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lop in my_lop %}
+                                <tr>
+                                    <td>{{ lop.ten_lop }}</td>
+                                    <td>{{ lop.lich_hoc }}</td>
+                                    <td>{{ lop.so_luong_hv }}/{{ lop.suc_chua }}</td>
+                                    <td>
+                                        {% if lop.trang_thai == 'active' %}
+                                        <span class="badge bg-success">Đang mở</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Đã đóng</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Bạn chưa phụ trách lớp nào</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

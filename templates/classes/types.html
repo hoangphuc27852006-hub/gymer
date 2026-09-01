@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Loại lớp học{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fa-solid fa-tags me-2 text-danger"></i>Loại lớp học</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">Thêm loại lớp</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('classes.add_class_type') }}">
+                    <div class="mb-3">
+                        <label for="ten_loai" class="form-label">Tên loại*</label>
+                        <input type="text" class="form-control" id="ten_loai" name="ten_loai" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="don_gia_pt" class="form-label">Đơn giá PT (VNĐ)*</label>
+                        <input type="number" class="form-control" id="don_gia_pt" name="don_gia_pt" required min="0" step="1000">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-plus"></i> Thêm loại</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên loại</th>
+                                <th>Đơn giá PT</th>
+                                <th>Số lớp</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loai in loai_list %}
+                            <tr>
+                                <td>{{ loai.ma_loai }}</td>
+                                <td>{{ loai.ten_loai }}</td>
+                                <td>{{ loai.don_gia_pt|vnd }}</td>
+                                <td>{{ loai.lop_hoc_list.count() }}</td>
+                                <td>
+                                    {% if loai.trang_thai == 'active' %}
+                                        <span class="badge bg-success">Hoạt động</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Ngừng hoạt động</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('classes.toggle_class_type', ma_loai=loai.ma_loai) }}" class="d-inline">
+                                        {% if loai.trang_thai == 'active' %}
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ngừng hoạt động loại lớp này?');"><i class="fa-solid fa-power-off"></i> Ngừng HĐ</button>
+                                        {% else %}
+                                        <button type="submit" class="btn btn-sm btn-success"><i class="fa-solid fa-power-off"></i> Kích hoạt</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Không có dữ liệu.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

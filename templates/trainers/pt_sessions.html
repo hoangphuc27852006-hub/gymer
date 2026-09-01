@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Buổi PT</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookSessionModal">
+        <i class="fa-solid fa-plus"></i> Đặt lịch
+    </button>
+</div>
+
+<!-- Modal Đặt lịch -->
+<div class="modal fade" id="bookSessionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Đặt lịch buổi PT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('book_pt_session') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Hội viên</label>
+                        <select name="ma_hv" class="form-select" required>
+                            <option value="">Chọn hội viên</option>
+                            {% for hv in hv_list %}
+                            <option value="{{ hv.id }}">{{ hv.ho_ten }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">PT</label>
+                        <select name="ma_pt" class="form-select" required>
+                            <option value="">Chọn PT</option>
+                            {% for pt in pt_list %}
+                            <option value="{{ pt.id }}">{{ pt.ho_ten }} - {{ pt.chuyen_mon }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời gian bắt đầu</label>
+                        <input type="datetime-local" name="thoi_gian" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thời lượng (phút)</label>
+                        <input type="number" name="thoi_luong" class="form-control" value="60" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Đơn giá PT (VNĐ)</label>
+                        <input type="number" name="gia" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="sessionFilterTabs">
+    <li class="nav-item">
+        <a class="nav-link active" href="?status=">Tất cả</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="?status=scheduled">Đã lên lịch</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="?status=completed">Hoàn thành</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="?status=cancelled">Đã hủy</a>
+    </li>
+</ul>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Hội viên</th>
+                    <th>PT</th>
+                    <th>Thời gian bắt đầu</th>
+                    <th>Thời lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for session in sessions %}
+                <tr>
+                    <td>{{ session.hoi_vien.ho_ten }}</td>
+                    <td>{{ session.pt.ho_ten }}</td>
+                    <td>{{ session.thoi_gian|datetimeformat }}</td>
+                    <td>{{ session.thoi_luong }} phút</td>
+                    <td>{{ session.gia|vnd }}</td>
+                    <td>
+                        {% if session.trang_thai == 'scheduled' %}
+                        <span class="badge bg-info">Đã lên lịch</span>
+                        {% elif session.trang_thai == 'completed' %}
+                        <span class="badge bg-success">Hoàn thành</span>
+                        {% elif session.trang_thai == 'cancelled' %}
+                        <span class="badge bg-danger">Đã hủy</span>
+                        {% elif session.trang_thai == 'absent' %}
+                        <span class="badge bg-warning">Vắng mặt</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if session.trang_thai == 'scheduled' %}
+                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="btn btn-sm btn-success" title="Đã dạy"><i class="fa-solid fa-check"></i></button>
+                        </form>
+                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
+                            <input type="hidden" name="status" value="absent">
+                            <button type="submit" class="btn btn-sm btn-warning" title="Vắng mặt"><i class="fa-solid fa-user-slash"></i></button>
+                        </form>
+                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
+                            <input type="hidden" name="status" value="cancelled">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Hủy"><i class="fa-solid fa-times"></i></button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center">Không có buổi PT nào.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

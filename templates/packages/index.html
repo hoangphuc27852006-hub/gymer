@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Gói tập{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fa-solid fa-tags me-2 text-danger"></i>Gói tập</h2>
+        <div>
+            {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+            <a href="{{ url_for('packages.buy') }}" class="btn btn-success me-2"><i class="fa-solid fa-cart-shopping me-1"></i>Đăng kí gói</a>
+            <a href="{{ url_for('packages.add') }}" class="btn btn-danger"><i class="fa-solid fa-plus me-1"></i>Thêm gói</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for goi in goi_list %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 bg-dark text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h4 class="card-title text-danger mb-0">{{ goi.ten_goi }}</h4>
+                        {% if goi.trang_thai == 'active' %}
+                        <span class="badge bg-success">Hoạt động</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Ngừng bán</span>
+                        {% endif %}
+                    </div>
+
+                    <h3 class="mb-4">{{ goi.gia_tien|vnd }}</h3>
+
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-muted"></i>Thời hạn: {{ goi.thoi_han_goi }} ngày</li>
+                        <li class="mb-2"><i class="fa-solid fa-dumbbell me-2 text-muted"></i>Số buổi PT: {{ goi.so_buoi_pt }} buổi</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent border-top border-secondary text-end">
+                    {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+                    <a href="{{ url_for('packages.edit', ma_goi=goi.ma_goi) }}" class="btn btn-outline-light btn-sm"><i class="fa-solid fa-pen me-1"></i>Sửa</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">Không có gói tập nào.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

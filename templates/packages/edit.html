@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 bg-dark text-white mt-4">
+                <div class="card-header bg-danger text-white border-0 py-3">
+                    <h4 class="mb-0"><i class="fa-solid fa-pen me-2"></i>Sửa gói tập</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('packages.edit', id=goi.ma_goi) }}">
+                        <div class="mb-3">
+                            <label for="ten_goi" class="form-label">Tên gói <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-secondary text-white border-0" id="ten_goi" name="ten_goi" value="{{ goi.ten_goi }}" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="thoi_han" class="form-label">Thời hạn (ngày) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control bg-secondary text-white border-0" id="thoi_han" name="thoi_han" min="1" value="{{ goi.thoi_han }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="gia_tien" class="form-label">Giá tiền (VND) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control bg-secondary text-white border-0" id="gia_tien" name="gia_tien" min="0" value="{{ goi.gia_tien }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="so_buoi_pt" class="form-label">Số buổi PT kèm theo</label>
+                            <input type="number" class="form-control bg-secondary text-white border-0" id="so_buoi_pt" name="so_buoi_pt" min="0" value="{{ goi.so_buoi_pt }}">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="trang_thai" class="form-label">Trạng thái</label>
+                            <select class="form-select bg-secondary text-white border-0" id="trang_thai" name="trang_thai">
+                                <option value="active" {% if goi.trang_thai == 'active' %}selected{% endif %}>Hoạt động</option>
+                                <option value="inactive" {% if goi.trang_thai == 'inactive' %}selected{% endif %}>Ngừng bán</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ url_for('packages.index') }}" class="btn btn-secondary">Hủy</a>
+                            <button type="submit" class="btn btn-danger">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

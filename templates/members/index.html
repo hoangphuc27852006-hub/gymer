@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Hội viên - Hệ thống Quản lý Phòng Gym{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Hội viên</h1>
+    {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
+    <a href="{{ url_for('members.add') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Thêm hội viên
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('members.index') }}" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Tìm theo tên, SĐT..." value="{{ q or '' }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="active" {% if status == 'active' %}selected{% endif %}>Đang HĐ</option>
+                    <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Ngừng HĐ</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>STT</th>
+                        <th>Họ tên</th>
+                        <th>SĐT</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
+                        <th>Trạng thái</th>
+                        <th>Gói hiện tại</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hv in members.items %}
+                    <tr>
+                        <td>{{ loop.index + (members.page - 1) * members.per_page }}</td>
+                        <td>{{ hv.ho_ten }}</td>
+                        <td>{{ hv.sdt }}</td>
+                        <td>{{ 'Nam' if hv.gioi_tinh == 'Nam' else 'Nữ' }}</td>
+                        <td>{{ hv.ngay_sinh|dateformat if hv.ngay_sinh else '' }}</td>
+                        <td>
+                            {% if hv.trang_thai == 'active' %}
+                                <span class="badge bg-success">Đang HĐ</span>
+                            {% elif hv.trang_thai == 'inactive' %}
+                                <span class="badge bg-secondary">Ngừng HĐ</span>
+                            {% elif hv.trang_thai == 'waiting' %}
+                                <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            {% else %}
+                                <span class="badge bg-danger">{{ hv.trang_thai }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ hv.goi_hien_tai or 'Không có' }}</td>
+                        <td>
+                            <a href="{{ url_for('members.detail', ma_hv=hv.ma_hv) }}" class="btn btn-sm btn-info text-white">
+                                <i class="fas fa-eye"></i> Xem
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">Không có dữ liệu</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if members.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not members.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('members.index', page=members.prev_num, q=q, status=status) if members.has_prev else '#' }}">Trước</a>
+                </li>
+                {% for page_num in members.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == members.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('members.index', page=page_num, q=q, status=status) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not members.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('members.index', page=members.next_num, q=q, status=status) if members.has_next else '#' }}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

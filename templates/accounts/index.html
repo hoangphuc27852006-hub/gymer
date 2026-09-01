@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Tài khoản hệ thống</h2>
+        <a href="{{ url_for('accounts.add') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Tạo tài khoản
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên đăng nhập</th>
+                            <th>Vai trò</th>
+                            <th>Đối tượng</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tk in tks %}
+                        <tr>
+                            <td><strong>{{ tk.ten_dang_nhap }}</strong></td>
+                            <td>
+                                {% if tk.vai_tro == 'admin' %}
+                                <span class="badge bg-danger">Admin</span>
+                                {% elif tk.vai_tro == 'nhanvien' %}
+                                <span class="badge bg-primary">Nhân viên</span>
+                                {% elif tk.vai_tro == 'pt' %}
+                                <span class="badge bg-success">PT</span>
+                                {% elif tk.vai_tro == 'hoivien' %}
+                                <span class="badge bg-info text-dark">Hội viên</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ tk.vai_tro }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if tk.ma_hv and tk.hoi_vien %}
+                                <i class="fa-solid fa-user text-muted"></i> {{ tk.hoi_vien.ho_ten }}
+                                {% elif tk.ma_nv and tk.nhan_vien %}
+                                <i class="fa-solid fa-user-tie text-muted"></i> {{ tk.nhan_vien.ho_ten }}
+                                {% elif tk.ma_pt and tk.pt %}
+                                <i class="fa-solid fa-dumbbell text-muted"></i> {{ tk.pt.ho_ten }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if tk.trang_thai == 'active' %}
+                                <span class="badge bg-success">Đang hoạt động</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Bị khóa</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form action="{{ url_for('accounts.toggle', id=tk.id) }}" method="POST" class="d-inline">
+                                    {% if tk.trang_thai == 'active' %}
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Khóa"><i class="fa-solid fa-lock"></i> Khóa</button>
+                                    {% else %}
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Mở khóa"><i class="fa-solid fa-unlock"></i> Mở khóa</button>
+                                    {% endif %}
+                                </form>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#resetModal{{ tk.id }}">
+                                    <i class="fa-solid fa-key"></i> Reset
+                                </button>
+                                <form action="{{ url_for('accounts.delete', id=tk.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"><i class="fa-solid fa-trash"></i> Xóa</button>
+                                </form>
+
+                                <!-- Reset Password Modal -->
+                                <div class="modal fade" id="resetModal{{ tk.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Reset mật khẩu: {{ tk.ten_dang_nhap }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{ url_for('accounts.reset_password', id=tk.id) }}" method="POST">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Mật khẩu mới</label>
+                                                        <input type="password" name="new_password" class="form-control" required minlength="6">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary">Lưu mật khẩu</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Chưa có tài khoản nào.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

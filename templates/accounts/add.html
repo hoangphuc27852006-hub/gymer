@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Thêm Tài khoản mới</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('accounts.add') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="ten_dang_nhap" class="form-label">Tên đăng nhập <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ten_dang_nhap" name="ten_dang_nhap" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mat_khau" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="mat_khau" name="mat_khau" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vai_tro" class="form-label">Vai trò</label>
+                            <select class="form-select" id="vai_tro" name="vai_tro" required>
+                                <option value="admin">Admin</option>
+                                <option value="nhanvien">Nhân viên</option>
+                                <option value="pt">PT</option>
+                                <option value="hoivien">Hội viên</option>
+                            </select>
+                        </div>
+
+                        <!-- Dynamic fields based on role -->
+                        <div class="mb-3" id="div_ma_nv" style="display: none;">
+                            <label for="ma_nv" class="form-label">Chọn Nhân viên</label>
+                            <select class="form-select select2" id="ma_nv" name="ma_nv">
+                                <option value="">-- Chọn nhân viên --</option>
+                                {% for nv in nv_list %}
+                                <option value="{{ nv.ma_nv }}">{{ nv.ho_ten }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="div_ma_pt" style="display: none;">
+                            <label for="ma_pt" class="form-label">Chọn PT</label>
+                            <select class="form-select select2" id="ma_pt" name="ma_pt">
+                                <option value="">-- Chọn PT --</option>
+                                {% for pt in pt_list %}
+                                <option value="{{ pt.ma_pt }}">{{ pt.ho_ten }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="div_ma_hv" style="display: none;">
+                            <label for="ma_hv" class="form-label">Chọn Hội viên</label>
+                            <select class="form-select select2" id="ma_hv" name="ma_hv">
+                                <option value="">-- Chọn hội viên --</option>
+                                {% for hv in hv_list %}
+                                <option value="{{ hv.ma_hv }}">{{ hv.ho_ten }} ({{ hv.sdt }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{{ url_for('accounts.index') }}" class="btn btn-secondary">Hủy</a>
+                            <button type="submit" class="btn btn-primary">Lưu tài khoản</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const vaiTroSelect = document.getElementById("vai_tro");
+        const divNv = document.getElementById("div_ma_nv");
+        const divPt = document.getElementById("div_ma_pt");
+        const divHv = document.getElementById("div_ma_hv");
+
+        function updateFields() {
+            const val = vaiTroSelect.value;
+            divNv.style.display = (val === 'nhanvien') ? 'block' : 'none';
+            divPt.style.display = (val === 'pt') ? 'block' : 'none';
+            divHv.style.display = (val === 'hoivien') ? 'block' : 'none';
+        }
+
+        vaiTroSelect.addEventListener("change", updateFields);
+        updateFields(); // run on load
+    });
+</script>
+{% endblock %}

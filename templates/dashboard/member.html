@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-danger"><i class="fa-solid fa-user me-2"></i>Khu vực Hội Viên</h2>
+        <span class="fs-5 text-white">Xin chào, <strong>{{ hv_obj.ho_ten }}</strong></span>
+    </div>
+    
+    <div class="row mb-4">
+        <!-- Gói hiện tại -->
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-id-card me-2 text-success"></i>Gói tập hiện tại</h5>
+                </div>
+                <div class="card-body">
+                    {% if goi_ht %}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h4 class="text-danger mb-0">{{ goi_ht.ten_goi }}</h4>
+                        <span class="badge bg-success">Đang hoạt động</span>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-6 mb-3 mb-sm-0">
+                            <p class="text-muted mb-1">Ngày đăng kí</p>
+                            <h6>{{ goi_ht.ngay_dang_ki|dateformat }}</h6>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-muted mb-1">Ngày hết hạn</p>
+                            <h6>{{ goi_ht.ngay_het_han|dateformat }}</h6>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2 d-flex justify-content-between">
+                        <span class="text-muted">Tiến độ gói tập</span>
+                        <span>Còn <strong>{{ goi_ht.ngay_con_lai }}</strong> ngày</span>
+                    </div>
+                    <div class="progress bg-secondary" style="height: 10px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ goi_ht.phan_tram_tien_do }}%;" aria-valuenow="{{ goi_ht.phan_tram_tien_do }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning text-center my-3">
+                        Bạn chưa đăng kí hoặc gói tập đã hết hạn. <a href="{{ url_for('packages.index') }}" class="alert-link">Xem các gói tập</a>.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chỉ số cơ thể mới nhất -->
+        <div class="col-lg-4">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-weight-scale me-2 text-info"></i>Chỉ số cơ thể mới nhất</h5>
+                </div>
+                <div class="card-body">
+                    {% if chi_so_latest %}
+                    <div class="text-center mb-4">
+                        <h6 class="text-muted">Cập nhật ngày {{ chi_so_latest.ngay_do|dateformat }}</h6>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-6 border-end border-secondary">
+                            <h3 class="mb-0">{{ chi_so_latest.chieu_cao }}</h3>
+                            <small class="text-muted">Chiều cao (cm)</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="mb-0">{{ chi_so_latest.can_nang }}</h3>
+                            <small class="text-muted">Cân nặng (kg)</small>
+                        </div>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="row text-center mt-3">
+                        <div class="col-4">
+                            <h5 class="mb-0">{{ chi_so_latest.co }}</h5>
+                            <small class="text-muted">Cơ (%)</small>
+                        </div>
+                        <div class="col-4 border-start border-end border-secondary">
+                            <h5 class="mb-0">{{ chi_so_latest.mo }}</h5>
+                            <small class="text-muted">Mỡ (%)</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="mb-0 text-success">{{ chi_so_latest.bmi }}</h5>
+                            <small class="text-muted">BMI</small>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-4">
+                        Chưa có dữ liệu chỉ số cơ thể
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Buổi PT sắp tới -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-calendar-check me-2 text-warning"></i>Buổi PT sắp tới</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% for pt in my_buoi_pt %}
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <h6 class="mb-1 text-danger">{{ pt.thoi_gian|datetimeformat }}</h6>
+                                <span class="text-muted"><i class="fa-solid fa-chalkboard-teacher me-1"></i>PT: {{ pt.ho_ten_pt }}</span>
+                            </div>
+                            <span class="badge bg-info">Sắp diễn ra</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item bg-dark text-white border-secondary text-center text-muted py-4">
+                            Không có buổi PT nào sắp tới
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lớp học đã đăng kí -->
+        <div class="col-md-6">
+            <div class="card bg-dark text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="mb-0"><i class="fa-solid fa-people-group me-2 text-primary"></i>Buổi học đã đăng kí</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Lớp học</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hoc in my_buoi_hoc %}
+                                <tr>
+                                    <td>{{ hoc.thoi_gian|datetimeformat }}</td>
+                                    <td>{{ hoc.ten_lop }}</td>
+                                    <td>
+                                        {% if hoc.trang_thai == 'confirmed' %}
+                                        <span class="badge bg-success">Đã xác nhận</span>
+                                        {% elif hoc.trang_thai == 'waiting' %}
+                                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">{{ hoc.trang_thai }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">Chưa đăng kí buổi học nào</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
