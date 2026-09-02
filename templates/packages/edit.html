@@ -9,7 +9,7 @@
                     <h4 class="mb-0"><i class="fa-solid fa-pen me-2"></i>Sửa gói tập</h4>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('packages.edit', id=goi.ma_goi) }}">
+                    <form method="POST" action="{{ url_for('packages.edit', ma_goi=goi.ma_goi) }}">
                         <div class="mb-3">
                             <label for="ten_goi" class="form-label">Tên gói <span class="text-danger">*</span></label>
                             <input type="text" class="form-control bg-secondary text-white border-0" id="ten_goi" name="ten_goi" value="{{ goi.ten_goi }}" required>

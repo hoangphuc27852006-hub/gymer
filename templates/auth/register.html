@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - GYM FIT</title>
-    
-    <!-- Google Fonts: Inter -->
+    <title>Đăng ký - GYM FIT</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -23,50 +18,42 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .login-card {
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
             padding: 40px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             background-color: white;
         }
-        
+
         .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .login-header i {
             font-size: 3rem;
             color: #c0392b;
             margin-bottom: 10px;
         }
-        
+
         .login-header h2 {
             font-weight: 700;
             color: #1a1a2e;
         }
-        
+
         .btn-primary {
             background-color: #c0392b;
             border-color: #c0392b;
             padding: 10px;
             font-weight: 600;
         }
-        
+
         .btn-primary:hover {
             background-color: #a93226;
             border-color: #a93226;
-        }
-        
-        .demo-accounts {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -74,15 +61,14 @@
 
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
+            <div class="col-md-7 col-lg-6">
                 <div class="login-card">
                     <div class="login-header">
                         <i class="fa-solid fa-dumbbell"></i>
                         <h2>GYM FIT</h2>
-                        <p class="text-muted">Hệ Thống Quản Lý Phòng Tập</p>
+                        <p class="text-muted">Đăng Ký Tài Khoản Hội Viên</p>
                     </div>
-                    
-                    <!-- Flash Messages -->
+
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
                             {% for category, message in messages %}
@@ -94,50 +80,63 @@
                         {% endif %}
                     {% endwith %}
 
-                    <form method="POST" action="{{ url_for('auth.login') }}">
+                    <form method="POST" action="{{ url_for('auth.register') }}">
                         <div class="mb-3">
-                            <label for="username" class="form-label fw-bold">Tên đăng nhập</label>
+                            <label for="ho_ten" class="form-label fw-bold">Họ và tên <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                <input type="text" class="form-control" id="ho_ten" name="ho_ten" required
+                                       value="{{ form.get('ho_ten', '') }}" placeholder="Nhập họ và tên">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sdt" class="form-label fw-bold">Số điện thoại</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <input type="text" class="form-control" id="sdt" name="sdt"
+                                       value="{{ form.get('sdt', '') }}" placeholder="Nhập số điện thoại">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ten_dang_nhap" class="form-label fw-bold">Tên đăng nhập <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-                                <input type="text" class="form-control" id="username" name="username" required placeholder="Nhập tên đăng nhập">
+                                <input type="text" class="form-control" id="ten_dang_nhap" name="ten_dang_nhap" required
+                                       value="{{ form.get('ten_dang_nhap', '') }}" placeholder="Chọn tên đăng nhập">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
-                            <label for="password" class="form-label fw-bold">Mật khẩu</label>
+                            <label for="mat_khau" class="form-label fw-bold">Mật khẩu <span class="text-danger">*</span></label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                <input type="password" class="form-control" id="password" name="password" required placeholder="Nhập mật khẩu">
+                                <input type="password" class="form-control" id="mat_khau" name="mat_khau" required
+                                       placeholder="Tối thiểu 6 ký tự">
                             </div>
                         </div>
-                        
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                            <label class="form-check-label" for="remember">Ghi nhớ đăng nhập</label>
+
+                        <div class="mb-3">
+                            <label for="xac_nhan_mat_khau" class="form-label fw-bold">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" class="form-control" id="xac_nhan_mat_khau" name="xac_nhan_mat_khau" required
+                                       placeholder="Nhập lại mật khẩu">
+                            </div>
                         </div>
-                        
-                        <button type="submit" class="btn btn-primary w-100 mt-2">ĐĂNG NHẬP</button>
+
+                        <button type="submit" class="btn btn-primary w-100 mt-2">ĐĂNG KÝ</button>
                     </form>
 
                     <p class="text-center mt-3 mb-0">
-                        Chưa có tài khoản? <a href="{{ url_for('auth.register') }}">Đăng ký ngay</a>
+                        Đã có tài khoản? <a href="{{ url_for('auth.login') }}">Đăng nhập ngay</a>
                     </p>
-
-                    <div class="demo-accounts text-center">
-                        <p class="fw-bold mb-2">Tài khoản Demo:</p>
-                        <ul class="list-unstyled mb-0">
-                            <li><span class="badge bg-danger">Admin</span> admin / admin123</li>
-                            <li><span class="badge bg-primary">Lễ tân</span> letan / letan123</li>
-                            <li><span class="badge bg-success">PT</span> pt_hung / pt123</li>
-                            <li><span class="badge bg-info">Hội viên</span> hv_an / hv123</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

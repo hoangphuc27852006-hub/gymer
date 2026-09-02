@@ -2,7 +2,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Chi tiết Huấn luyện viên</h2>
-    <a href="{{ url_for('trainers') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+    <a href="{{ url_for('trainers.index') }}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
 </div>
 
 <ul class="nav nav-tabs mb-4" id="ptTab" role="tablist">
@@ -50,7 +50,7 @@
                                 </tr>
                                 <tr>
                                     <th>Kinh nghiệm</th>
-                                    <td>{{ pt.kinh_nghiem }} năm</td>
+                                    <td>{{ pt.so_nam_kinh_nghiem }} năm</td>
                                 </tr>
                                 <tr>
                                     <th>Lương cơ bản</th>
@@ -58,9 +58,9 @@
                                 </tr>
                             </tbody>
                         </table>
-                        {% if session.get('role') == 'staff' %}
+                        {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
                         <div class="mt-3 text-end">
-                            <a href="{{ url_for('edit_trainer', id=pt.id) }}" class="btn btn-primary"><i class="fa-solid fa-edit"></i> Sửa thông tin</a>
+                            <a href="{{ url_for('trainers.edit', ma_pt=pt.ma_pt) }}" class="btn btn-primary"><i class="fa-solid fa-edit"></i> Sửa thông tin</a>
                         </div>
                         {% endif %}
                     </div>
@@ -88,18 +88,20 @@
                         {% for lop in lop_list %}
                         <tr>
                             <td>{{ lop.ten_lop }}</td>
-                            <td>{{ lop.loai }}</td>
-                            <td>{{ lop.gio }}</td>
-                            <td>{{ lop.lich }}</td>
+                            <td>{{ lop.loai_lop.ten_loai if lop.loai_lop else '—' }}</td>
+                            <td>{{ lop.gio_bat_dau|datetimeformat('%H:%M') }} - {{ lop.gio_ket_thuc|datetimeformat('%H:%M') }}</td>
+                            <td>{{ lop.thu_hoc_display }}</td>
                             <td>
-                                {% if lop.trang_thai == 'active' %}
+                                {% if lop.trang_thai == 'open' %}
                                 <span class="badge bg-success">Đang mở</span>
+                                {% elif lop.trang_thai == 'full' %}
+                                <span class="badge bg-warning text-dark">Đã đầy</span>
                                 {% else %}
                                 <span class="badge bg-danger">Đã đóng</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('class_detail', id=lop.id) }}" class="btn btn-sm btn-outline-primary">Xem</a>
+                                <a href="{{ url_for('classes.detail', ma_lop=lop.ma_lop) }}" class="btn btn-sm btn-outline-primary">Xem</a>
                             </td>
                         </tr>
                         {% else %}
@@ -129,9 +131,9 @@
                         {% for buoi in buoi_pt_list %}
                         <tr>
                             <td>{{ buoi.hoi_vien.ho_ten }}</td>
-                            <td>{{ buoi.thoi_gian|datetimeformat }}</td>
+                            <td>{{ buoi.thoi_gian_bat_dau|datetimeformat }}</td>
                             <td>{{ buoi.thoi_luong }} phút</td>
-                            <td>{{ buoi.gia|vnd }}</td>
+                            <td>{{ buoi.don_gia_pt|vnd }}</td>
                             <td>
                                 {% if buoi.trang_thai == 'scheduled' %}
                                 <span class="badge bg-info">Đã lên lịch</span>

@@ -27,6 +27,12 @@ def create_app():
     # ── Extensions ────────────────────────────────────────
     db.init_app(app)
 
+    # Tự động tạo bảng + seed dữ liệu mẫu ngay khi app khởi động.
+    # Quan trọng: khi deploy bằng gunicorn (Render, Procfile...), khối
+    # `if __name__ == '__main__'` phía dưới KHÔNG chạy, nên nếu không
+    # gọi init_db() ở đây thì database sẽ không có bảng nào -> lỗi 500.
+    init_db(app)
+
     login_manager = LoginManager(app)
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Vui lòng đăng nhập để tiếp tục.'
@@ -86,5 +92,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    init_db(app)
     app.run(debug=True, host='0.0.0.0', port=5000)

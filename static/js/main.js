@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Body stat chart (if canvas exists)
   initBodyStatChart();
 
+  updateDurations();
+  setInterval(updateDurations, 1000);
+
 });
 
 
@@ -247,18 +250,22 @@ function formatVND(value) {
 
 
 // ── Duration display (checkin duration) ─────────────────────
-function updateDurations() {
-  document.querySelectorAll('[data-checkin-time]').forEach(el => {
-    const checkinStr = el.dataset.checkinTime;
-    if (!checkinStr) return;
-    const checkin = new Date(checkinStr);
-    const now     = new Date();
-    const mins    = Math.floor((now - checkin) / 60000);
-    const h       = Math.floor(mins / 60);
-    const m       = mins % 60;
-    el.textContent = h > 0 ? `${h}g ${m}p` : `${m} phút`;
-  });
+function parseCheckinTime(str) {
+  if (!str) return null;
+  const parsed = new Date(str);
+  if (!isNaN(parsed.getTime())) return parsed;
+  const fallback = new Date(String(str).replace(' ', 'T'));
+  return isNaN(fallback.getTime()) ? null : fallback;
 }
 
-updateDurations();
-setInterval(updateDurations, 60000);
+function updateDurations() {
+  document.querySelectorAll('[data-checkin-time]').forEach(el => {
+    const checkin = parseCheckinTime(el.dataset.checkinTime);
+    if (!checkin) return;
+    const mins = Math.max(0, Math.floor((Date.now() - checkin.getTime()) / 60000));
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    const text = h > 0 ? `${h}g ${m}p` : `${m} phút`;
+    el.innerHTML = `<i class="fa-solid fa-clock"></i> ${text}`;
+  });
+}

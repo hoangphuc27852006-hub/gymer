@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Sửa lớp học: {{ lop.ten_lop }}</h2>
+    <a href="{{ url_for('classes.detail', ma_lop=lop.ma_lop) }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Trở lại</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('classes.edit', ma_lop=lop.ma_lop) }}">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="ten_lop" class="form-label">Tên lớp*</label>
+                    <input type="text" class="form-control" id="ten_lop" name="ten_lop" required value="{{ lop.ten_lop }}">
+                </div>
+                <div class="col-md-6">
+                    <label for="trang_thai" class="form-label">Trạng thái*</label>
+                    <select class="form-select" id="trang_thai" name="trang_thai" required>
+                        <option value="open" {% if lop.trang_thai == 'open' %}selected{% endif %}>Đang mở</option>
+                        <option value="closed" {% if lop.trang_thai == 'closed' %}selected{% endif %}>Đã đóng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label for="ma_pt" class="form-label">Huấn luyện viên*</label>
+                    <select class="form-select" id="ma_pt" name="ma_pt" required>
+                        {% for pt in pt_list %}
+                        <option value="{{ pt.ma_pt }}" {% if pt.ma_pt == lop.ma_pt %}selected{% endif %}>{{ pt.ho_ten }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="ma_phong" class="form-label">Phòng tập*</label>
+                    <select class="form-select" id="ma_phong" name="ma_phong" required>
+                        {% for phong in phong_list %}
+                        <option value="{{ phong.ma_phong }}" {% if phong.ma_phong == lop.ma_phong %}selected{% endif %}>{{ phong.ten_phong }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="alert alert-secondary" role="alert">
+                <i class="fa-solid fa-circle-info"></i> Thứ học, giờ học và thời gian khóa không thể chỉnh sửa sau khi tạo lớp.
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Lưu thay đổi</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

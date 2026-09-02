@@ -447,6 +447,25 @@ a:hover { text-decoration: none; }
   background: #f0fff4;
 }
 
+.checkin-clock {
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+
+.checkin-page .gym-card .card-header {
+  gap: 8px;
+}
+
+.duration-badge {
+  font-weight: 600;
+  font-size: 13px;
+}
+
 /* ── Progress bars ───────────────────────────────────────────── */
 .progress { border-radius: 10px; background: #f0f2f5; }
 .progress-bar { border-radius: 10px; background: var(--gym-red); }
@@ -477,7 +496,8 @@ a:hover { text-decoration: none; }
   #sidebar.show {
     transform: translateX(0);
   }
-  #main-wrapper {
+  #main-wrapper,
+  #main-content {
     margin-left: 0;
   }
   .page-content { padding: 16px; }

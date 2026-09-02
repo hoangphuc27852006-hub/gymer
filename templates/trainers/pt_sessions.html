@@ -15,14 +15,14 @@
                 <h5 class="modal-title">Đặt lịch buổi PT</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="{{ url_for('book_pt_session') }}">
+            <form method="POST" action="{{ url_for('trainers.book_pt_session') }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Hội viên</label>
                         <select name="ma_hv" class="form-select" required>
                             <option value="">Chọn hội viên</option>
                             {% for hv in hv_list %}
-                            <option value="{{ hv.id }}">{{ hv.ho_ten }}</option>
+                            <option value="{{ hv.ma_hv }}">{{ hv.ho_ten }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -31,7 +31,7 @@
                         <select name="ma_pt" class="form-select" required>
                             <option value="">Chọn PT</option>
                             {% for pt in pt_list %}
-                            <option value="{{ pt.id }}">{{ pt.ho_ten }} - {{ pt.chuyen_mon }}</option>
+                            <option value="{{ pt.ma_pt }}">{{ pt.ho_ten }} - {{ pt.chuyen_mon }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -91,9 +91,9 @@
                 <tr>
                     <td>{{ session.hoi_vien.ho_ten }}</td>
                     <td>{{ session.pt.ho_ten }}</td>
-                    <td>{{ session.thoi_gian|datetimeformat }}</td>
+                    <td>{{ session.thoi_gian_bat_dau|datetimeformat }}</td>
                     <td>{{ session.thoi_luong }} phút</td>
-                    <td>{{ session.gia|vnd }}</td>
+                    <td>{{ session.don_gia_pt|vnd }}</td>
                     <td>
                         {% if session.trang_thai == 'scheduled' %}
                         <span class="badge bg-info">Đã lên lịch</span>
@@ -107,16 +107,13 @@
                     </td>
                     <td>
                         {% if session.trang_thai == 'scheduled' %}
-                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
-                            <input type="hidden" name="status" value="completed">
+                        <form method="POST" action="{{ url_for('trainers.complete_pt_session', buoi_id=session.ma_buoi_pt) }}" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-success" title="Đã dạy"><i class="fa-solid fa-check"></i></button>
                         </form>
-                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
-                            <input type="hidden" name="status" value="absent">
+                        <form method="POST" action="{{ url_for('trainers.absent_pt_session', buoi_id=session.ma_buoi_pt) }}" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-warning" title="Vắng mặt"><i class="fa-solid fa-user-slash"></i></button>
                         </form>
-                        <form method="POST" action="{{ url_for('update_pt_session_status', id=session.id) }}" class="d-inline">
-                            <input type="hidden" name="status" value="cancelled">
+                        <form method="POST" action="{{ url_for('trainers.cancel_pt_session', buoi_id=session.ma_buoi_pt) }}" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger" title="Hủy"><i class="fa-solid fa-times"></i></button>
                         </form>
                         {% endif %}

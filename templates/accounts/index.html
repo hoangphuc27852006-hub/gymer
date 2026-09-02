@@ -58,29 +58,29 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <form action="{{ url_for('accounts.toggle', id=tk.id) }}" method="POST" class="d-inline">
+                                <form action="{{ url_for('accounts.toggle', ma_tk=tk.ma_tk) }}" method="POST" class="d-inline">
                                     {% if tk.trang_thai == 'active' %}
                                     <button type="submit" class="btn btn-sm btn-outline-warning" title="Khóa"><i class="fa-solid fa-lock"></i> Khóa</button>
                                     {% else %}
                                     <button type="submit" class="btn btn-sm btn-outline-success" title="Mở khóa"><i class="fa-solid fa-unlock"></i> Mở khóa</button>
                                     {% endif %}
                                 </form>
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#resetModal{{ tk.id }}">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#resetModal{{ tk.ma_tk }}">
                                     <i class="fa-solid fa-key"></i> Reset
                                 </button>
-                                <form action="{{ url_for('accounts.delete', id=tk.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                <form action="{{ url_for('accounts.delete', ma_tk=tk.ma_tk) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"><i class="fa-solid fa-trash"></i> Xóa</button>
                                 </form>
 
                                 <!-- Reset Password Modal -->
-                                <div class="modal fade" id="resetModal{{ tk.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal fade" id="resetModal{{ tk.ma_tk }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Reset mật khẩu: {{ tk.ten_dang_nhap }}</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form action="{{ url_for('accounts.reset_password', id=tk.id) }}" method="POST">
+                                            <form action="{{ url_for('accounts.reset_password', ma_tk=tk.ma_tk) }}" method="POST">
                                                 <div class="modal-body">
                                                     <div class="mb-3">
                                                         <label class="form-label">Mật khẩu mới</label>

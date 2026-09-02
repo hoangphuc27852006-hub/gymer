@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Chi tiết buổi học</h2>
-    <a href="{{ url_for('classes.detail', id=buoi.ma_lop) }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Trở lại lớp</a>
+    <a href="{{ url_for('classes.detail', ma_lop=buoi.ma_lop) }}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Trở lại lớp</a>
 </div>
 
 <div class="row mb-4">
@@ -13,10 +13,10 @@
                 <h5 class="card-title mb-0">Thông tin buổi học</h5>
             </div>
             <div class="card-body">
-                <p><strong>Lớp:</strong> {{ buoi.lop.ten_lop }}</p>
-                <p><strong>Ngày học:</strong> {{ buoi.ngay_hoc|dateformat }} ({{ buoi.thu }})</p>
-                <p><strong>Giờ:</strong> {{ buoi.lop.gio_bat_dau|datetimeformat('%H:%M') }} - {{ buoi.lop.gio_ket_thuc|datetimeformat('%H:%M') }}</p>
-                <p><strong>Số lượng đăng kí:</strong> {{ buoi.so_luong_dk }} / {{ buoi.lop.phong_tap.suc_chua }}</p>
+                <p><strong>Lớp:</strong> {{ buoi.lop_hoc.ten_lop }}</p>
+                <p><strong>Ngày học:</strong> {{ buoi.ngay_hoc|dateformat }}</p>
+                <p><strong>Giờ:</strong> {{ buoi.lop_hoc.gio_bat_dau|datetimeformat('%H:%M') }} - {{ buoi.lop_hoc.gio_ket_thuc|datetimeformat('%H:%M') }}</p>
+                <p><strong>Số lượng đăng kí:</strong> {{ buoi.so_dang_ky }} / {{ buoi.lop_hoc.phong_tap.suc_chua }}</p>
                 <p><strong>Trạng thái:</strong> 
                     {% if buoi.trang_thai == 'scheduled' or buoi.trang_thai == 'upcoming' %}
                         <span class="badge bg-warning text-dark">Sắp diễn ra</span>
@@ -32,14 +32,14 @@
         </div>
     </div>
     
-    {% if current_user and current_user.role in ['admin', 'manager', 'staff'] %}
+    {% if current_user and current_user.vai_tro in ['admin', 'nhanvien'] %}
     <div class="col-md-6">
         <div class="card shadow-sm h-100">
             <div class="card-header bg-dark text-white">
                 <h5 class="card-title mb-0">Cập nhật trạng thái</h5>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ url_for('classes.update_session_status', id=buoi.ma_buoi) }}">
+                <form method="POST" action="{{ url_for('classes.update_session_status', ma_buoi=buoi.ma_buoi) }}">
                     <div class="mb-3">
                         <label for="trang_thai" class="form-label">Trạng thái mới</label>
                         <select class="form-select" id="trang_thai" name="trang_thai">
@@ -57,18 +57,18 @@
     {% endif %}
 </div>
 
-{% if current_user and current_user.role in ['admin', 'manager', 'staff'] and buoi.trang_thai in ['upcoming', 'ongoing'] %}
+{% if current_user and current_user.vai_tro in ['admin', 'nhanvien'] and buoi.trang_thai in ['upcoming', 'ongoing'] %}
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-dark text-white">
         <h5 class="card-title mb-0">Thêm người đăng kí</h5>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ url_for('classes.add_registration', id=buoi.ma_buoi) }}" class="row g-3">
+        <form method="POST" action="{{ url_for('classes.register_session', ma_buoi=buoi.ma_buoi) }}" class="row g-3">
             <div class="col-md-8">
                 <select class="form-select" name="ma_hv" required>
                     <option value="">-- Chọn hội viên --</option>
                     {% for hv in hv_list %}
-                    <option value="{{ hv.ma_hv }}">{{ hv.ho_ten }} - {{ hv.so_dien_thoai }}</option>
+                    <option value="{{ hv.ma_hv }}">{{ hv.ho_ten }} - {{ hv.sdt }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -109,7 +109,7 @@
                         </td>
                         <td>
                             {% if dk.trang_thai != 'cancelled' %}
-                            <form method="POST" action="{{ url_for('classes.cancel_registration', id=dk.ma_dk) }}" class="d-inline">
+                            <form method="POST" action="{{ url_for('classes.cancel_registration', dk_id=dk.ma_dk_buoi) }}" class="d-inline">
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn hủy đăng kí này?');"><i class="fa-solid fa-xmark"></i> Hủy</button>
                             </form>
                             {% endif %}

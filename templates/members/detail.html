@@ -72,10 +72,16 @@
                     <h6 class="m-0 font-weight-bold text-primary">Gói tập hiện tại</h6>
                     <div>
                         <a href="{{ url_for('packages.buy', ma_hv=hv.ma_hv) }}" class="btn btn-sm btn-success">Mua gói</a>
-                        <form method="POST" action="{{ url_for('checkin.do') }}" class="d-inline">
+                        {% if dang_checkin %}
+                        <form method="POST" action="{{ url_for('checkin.do_checkout', luot_id=dang_checkin.ma_luot) }}" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Check-out</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('checkin.do_checkin') }}" class="d-inline">
                             <input type="hidden" name="ma_hv" value="{{ hv.ma_hv }}">
                             <button type="submit" class="btn btn-sm btn-info text-white">Check-in</button>
                         </form>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="card-body">
@@ -158,9 +164,20 @@
                     <tbody>
                         {% for checkin in checkin_list %}
                         <tr>
-                            <td>{{ checkin.thoi_gian_vao|datetimeformat }}</td>
-                            <td>{{ checkin.thoi_gian_ra|datetimeformat if checkin.thoi_gian_ra else 'Chưa ra' }}</td>
-                            <td>{{ checkin.thoi_luong or '-' }}</td>
+                            <td>{{ checkin.thoi_gian_checkin|datetimeformat }}</td>
+                            <td>{{ checkin.thoi_gian_checkout|datetimeformat if checkin.thoi_gian_checkout else 'Chưa ra' }}</td>
+                            <td>
+                                {% if checkin.thoi_gian_checkin %}
+                                    {% set end = checkin.thoi_gian_checkout %}
+                                    {% if end %}
+                                        {{ ((end - checkin.thoi_gian_checkin).total_seconds() / 60)|int }} phút
+                                    {% else %}
+                                        Đang tập
+                                    {% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
                         </tr>
                         {% else %}
                         <tr><td colspan="3" class="text-center">Chưa có lịch sử check-in</td></tr>
@@ -206,11 +223,11 @@
                             <td>
                                 {% if current_user.vai_tro in ['admin', 'nhanvien'] %}
                                     {% if goi.trang_thai == 'waiting' %}
-                                    <form method="POST" action="{{ url_for('packages.activate', id=goi.id) }}" class="d-inline">
+                                    <form method="POST" action="{{ url_for('packages.activate', dk_id=goi.ma_dk_goi) }}" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-success">Kích hoạt</button>
                                     </form>
                                     {% elif goi.trang_thai == 'active' %}
-                                    <form method="POST" action="{{ url_for('packages.expire', id=goi.id) }}" class="d-inline">
+                                    <form method="POST" action="{{ url_for('packages.expire', dk_id=goi.ma_dk_goi) }}" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-danger">Báo hết hạn</button>
                                     </form>
                                     {% endif %}
@@ -244,15 +261,15 @@
                     <tbody>
                         {% for buoi in buoi_pt_list %}
                         <tr>
-                            <td>{{ buoi.pt_ten }}</td>
-                            <td>{{ buoi.thoi_gian|datetimeformat }}</td>
+                            <td>{{ buoi.pt.ho_ten if buoi.pt else '—' }}</td>
+                            <td>{{ buoi.thoi_gian_bat_dau|datetimeformat }}</td>
                             <td>
                                 {% if buoi.trang_thai == 'completed' %}<span class="badge bg-success">Đã hoàn thành</span>
                                 {% elif buoi.trang_thai == 'scheduled' %}<span class="badge bg-info">Đã lên lịch</span>
                                 {% elif buoi.trang_thai == 'cancelled' %}<span class="badge bg-danger">Đã hủy</span>
                                 {% else %}<span class="badge bg-secondary">{{ buoi.trang_thai }}</span>{% endif %}
                             </td>
-                            <td>{{ buoi.don_gia|vnd }}</td>
+                            <td>{{ buoi.don_gia_pt|vnd }}</td>
                         </tr>
                         {% else %}
                         <tr><td colspan="4" class="text-center">Chưa có buổi PT nào</td></tr>
@@ -273,7 +290,7 @@
         <h5 class="modal-title" id="addChiSoModalLabel">Thêm chỉ số cơ thể</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form method="POST" action="{{ url_for('members.add_chiso', ma_hv=hv.ma_hv) }}">
+      <form method="POST" action="{{ url_for('members.add_body_stat', ma_hv=hv.ma_hv) }}">
           <div class="modal-body">
               <div class="mb-3">
                   <label for="chieu_cao" class="form-label">Chiều cao (cm)</label>

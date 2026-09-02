@@ -106,10 +106,10 @@
                             <tbody>
                                 {% for ci in recent_checkins %}
                                 <tr>
-                                    <td>{{ ci.thoi_gian|datetimeformat }}</td>
-                                    <td>{{ ci.ho_ten }}</td>
+                                    <td>{{ ci.thoi_gian_checkin|datetimeformat }}</td>
+                                    <td>{{ ci.hoi_vien.ho_ten if ci.hoi_vien else '—' }}</td>
                                     <td>
-                                        {% if ci.goi_status == 'active' %}
+                                        {% if ci.hoi_vien and ci.hoi_vien.goi_hien_tai %}
                                         <span class="badge bg-success">Hợp lệ</span>
                                         {% else %}
                                         <span class="badge bg-danger">Hết hạn</span>

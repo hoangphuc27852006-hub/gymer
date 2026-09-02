@@ -5,7 +5,7 @@
         <h4 class="mb-0">Cập nhật Nhân viên</h4>
     </div>
     <div class="card-body p-4">
-        <form method="POST" action="{{ url_for('edit_staff', id=nv.id) }}">
+        <form method="POST" action="{{ url_for('staff.edit', ma_nv=nv.ma_nv) }}">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Họ tên <span class="text-danger">*</span></label>
@@ -43,7 +43,7 @@
                     </select>
                 </div>
                 <div class="col-12 mt-4 text-end">
-                    <a href="{{ url_for('staff') }}" class="btn btn-secondary">Hủy</a>
+                    <a href="{{ url_for('staff.index') }}" class="btn btn-secondary">Hủy</a>
                     <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </div>

@@ -28,10 +28,10 @@
                     <p class="card-text text-muted mb-3"><i class="fa-solid fa-users"></i> <strong>Sức chứa:</strong> {{ phong.suc_chua }} người</p>
                 </div>
                 <div class="card-footer bg-white border-top-0 d-flex justify-content-end gap-2 pb-3">
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ phong.id }}">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editRoomModal{{ phong.ma_phong }}">
                         <i class="fa-solid fa-pen-to-square"></i> Sửa
                     </button>
-                    <form action="{{ url_for('rooms.toggle', id=phong.id) }}" method="POST" class="d-inline">
+                    <form action="{{ url_for('rooms.toggle', ma_phong=phong.ma_phong) }}" method="POST" class="d-inline">
                         {% if phong.trang_thai == 'active' %}
                         <button type="submit" class="btn btn-sm btn-outline-warning" title="Bảo trì"><i class="fa-solid fa-wrench"></i> Bảo trì</button>
                         {% else %}
@@ -43,14 +43,14 @@
         </div>
 
         <!-- Edit Room Modal -->
-        <div class="modal fade" id="editRoomModal{{ phong.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="editRoomModal{{ phong.ma_phong }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header bg-dark text-white">
                         <h5 class="modal-title">Sửa thông tin phòng tập</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="{{ url_for('rooms.edit', id=phong.id) }}" method="POST">
+                    <form action="{{ url_for('rooms.edit', ma_phong=phong.ma_phong) }}" method="POST">
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label class="form-label">Tên phòng</label>
